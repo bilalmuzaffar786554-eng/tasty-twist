@@ -22,20 +22,20 @@ export const orderTimelineSteps: OrderStatus[] = [
 
 export const sizeOptions: { label: ProductSize; price: number }[] = [
   { label: "Regular", price: 0 },
-  { label: "Large", price: 2 },
+  { label: "Large", price: 200 },
 ];
 
 export const spiceLevels: SpiceLevel[] = ["Mild", "Medium", "Spicy"];
 
 export const addOnOptions: { label: AddOn; price: number }[] = [
-  { label: "Extra Cheese", price: 1 },
-  { label: "Extra Sauce", price: 0.5 },
-  { label: "Extra Patty", price: 2.5 },
-  { label: "Fries Upgrade", price: 1.99 },
+  { label: "Extra Cheese", price: 100 },
+  { label: "Extra Sauce", price: 50 },
+  { label: "Extra Patty", price: 250 },
+  { label: "Fries Upgrade", price: 199 },
 ];
 
 export function formatPrice(price: number) {
-  return `$${price.toFixed(2)}`;
+  return `Rs. ${Math.round(price).toLocaleString("en-PK")}`;
 }
 
 export function getDefaultCustomization(): ProductCustomization {
@@ -160,7 +160,7 @@ export function getCartQuantity(items: CartItem[]) {
 }
 
 export function getDeliveryFee(orderType: OrderType, items: CartItem[]) {
-  return orderType === "Delivery" && items.length > 0 ? 2.99 : 0;
+  return orderType === "Delivery" && items.length > 0 ? 299 : 0;
 }
 
 export function getDiscount(subtotal: number, isCouponApplied: boolean) {

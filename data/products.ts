@@ -17,7 +17,7 @@ export const menuItems: FoodItem[] = [
     description: "Crispy chicken, spicy mayo, lettuce, and toasted brioche.",
     details:
       "A crunchy chicken fillet stacked with cool lettuce, tangy pickles, creamy spicy mayo, and a toasted brioche bun.",
-    price: 8.99,
+    price: 899,
     ingredients: ["Crispy chicken", "Spicy mayo", "Lettuce", "Pickles", "Brioche bun"],
     badges: ["Popular", "Spicy", "Best Seller"],
     calories: 620,
@@ -35,7 +35,7 @@ export const menuItems: FoodItem[] = [
     description: "Double beef patty, cheddar, pickles, onions, and house sauce.",
     details:
       "Two seared beef patties with melted cheddar, grilled onions, crisp pickles, and Tasty Twist house sauce.",
-    price: 9.99,
+    price: 999,
     ingredients: ["Beef patties", "Cheddar", "Pickles", "Onions", "House sauce"],
     badges: ["Popular"],
     calories: 710,
@@ -53,7 +53,7 @@ export const menuItems: FoodItem[] = [
     description: "Stone-baked crust, mozzarella, pepperoni, and rich tomato sauce.",
     details:
       "A golden crust pizza topped with rich tomato sauce, stretchy mozzarella, and crisp pepperoni slices.",
-    price: 13.99,
+    price: 2499,
     ingredients: ["Pepperoni", "Mozzarella", "Tomato sauce", "Stone-baked crust"],
     badges: ["Popular", "Spicy", "Best Seller"],
     calories: 880,
@@ -71,7 +71,7 @@ export const menuItems: FoodItem[] = [
     description: "Fresh mozzarella, basil, olive oil, and slow-cooked tomato base.",
     details:
       "A simple classic with fresh mozzarella, basil, olive oil, and slow-cooked tomato sauce on a crisp base.",
-    price: 11.49,
+    price: 1999,
     ingredients: ["Fresh mozzarella", "Basil", "Olive oil", "Tomato base"],
     badges: ["New"],
     calories: 740,
@@ -89,7 +89,7 @@ export const menuItems: FoodItem[] = [
     description: "Juicy chicken, melted cheese, peppers, onions, and soft roll.",
     details:
       "Tender chicken strips layered with peppers, onions, and melted cheese inside a warm toasted roll.",
-    price: 10.99,
+    price: 1099,
     ingredients: ["Chicken strips", "Melted cheese", "Peppers", "Onions", "Soft roll"],
     badges: ["Popular"],
     calories: 690,
@@ -107,7 +107,7 @@ export const menuItems: FoodItem[] = [
     description: "Golden fries topped with cheese sauce, chicken bites, and herbs.",
     details:
       "Crispy fries finished with warm cheese sauce, juicy chicken bites, herbs, and a drizzle of house sauce.",
-    price: 6.49,
+    price: 649,
     ingredients: ["Golden fries", "Cheese sauce", "Chicken bites", "Herbs"],
     badges: ["Popular", "New", "Best Seller"],
     calories: 540,
@@ -125,7 +125,7 @@ export const menuItems: FoodItem[] = [
     description: "Crispy salted fries served hot with signature dipping sauce.",
     details:
       "Thin, crispy, golden fries tossed with sea salt and served with a creamy Tasty Twist dipping sauce.",
-    price: 3.99,
+    price: 399,
     ingredients: ["Potatoes", "Sea salt", "Signature dipping sauce"],
     badges: [],
     calories: 390,
@@ -143,7 +143,7 @@ export const menuItems: FoodItem[] = [
     description: "Chilled coffee blended smooth with cream and a sweet finish.",
     details:
       "Cold coffee blended with milk, cream, and ice for a smooth drink that balances sweetness and roast.",
-    price: 4.99,
+    price: 499,
     ingredients: ["Cold coffee", "Milk", "Cream", "Ice"],
     badges: ["New"],
     calories: 260,

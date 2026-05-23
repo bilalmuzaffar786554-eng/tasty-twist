@@ -28,7 +28,7 @@ values
 (
   'Zinger Burger',
   'Burgers',
-  8.99,
+  899,
   'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80',
   'Crispy chicken, spicy mayo, lettuce, and toasted brioche.',
   'A crunchy chicken fillet stacked with cool lettuce, tangy pickles, creamy spicy mayo, and a toasted brioche bun.',
@@ -42,7 +42,7 @@ values
 (
   'Smash Burger',
   'Burgers',
-  9.99,
+  999,
   'https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=900&q=80',
   'Double beef patty, cheddar, pickles, onions, and house sauce.',
   'Two seared beef patties with melted cheddar, grilled onions, crisp pickles, and Tasty Twist house sauce.',
@@ -56,7 +56,7 @@ values
 (
   'Pepperoni Pizza',
   'Pizza',
-  13.99,
+  2499,
   'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=900&q=80',
   'Stone-baked crust, mozzarella, pepperoni, and rich tomato sauce.',
   'A golden crust pizza topped with rich tomato sauce, stretchy mozzarella, and crisp pepperoni slices.',
@@ -70,7 +70,7 @@ values
 (
   'Margherita Pizza',
   'Pizza',
-  11.49,
+  1999,
   'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=900&q=80',
   'Fresh mozzarella, basil, olive oil, and slow-cooked tomato base.',
   'A simple classic with fresh mozzarella, basil, olive oil, and slow-cooked tomato sauce on a crisp base.',
@@ -84,7 +84,7 @@ values
 (
   'Chicken Cheese Steak',
   'Cheese Steaks',
-  10.99,
+  1099,
   'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=80',
   'Juicy chicken, melted cheese, peppers, onions, and soft roll.',
   'Tender chicken strips layered with peppers, onions, and melted cheese inside a warm toasted roll.',
@@ -98,7 +98,7 @@ values
 (
   'Loaded Fries',
   'Fries',
-  6.49,
+  649,
   'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80',
   'Golden fries topped with cheese sauce, chicken bites, and herbs.',
   'Crispy fries finished with warm cheese sauce, juicy chicken bites, herbs, and a drizzle of house sauce.',
@@ -112,7 +112,7 @@ values
 (
   'Classic Fries',
   'Fries',
-  3.99,
+  399,
   'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=900&q=80',
   'Crispy salted fries served hot with signature dipping sauce.',
   'Thin, crispy, golden fries tossed with sea salt and served with a creamy Tasty Twist dipping sauce.',
@@ -126,7 +126,7 @@ values
 (
   'Cold Coffee',
   'Drinks',
-  4.99,
+  499,
   'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80',
   'Chilled coffee blended smooth with cream and a sweet finish.',
   'Cold coffee blended with milk, cream, and ice for a smooth drink that balances sweetness and roast.',

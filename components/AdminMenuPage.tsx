@@ -304,7 +304,7 @@ export function AdminMenuPage() {
               <input
                 value={form.price}
                 onChange={(event) => updateForm("price", event.target.value)}
-                placeholder="Price, e.g. 8.99"
+                placeholder="Price, e.g. 899"
                 type="number"
                 min="0"
                 step="0.01"
