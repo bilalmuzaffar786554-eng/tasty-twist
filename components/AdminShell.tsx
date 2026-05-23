@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { clearAdminLogin, isAdminLoggedIn } from "@/utils/adminAuth";
 
 const adminLinks = [
   { href: "/admin", label: "Dashboard" },
@@ -13,6 +15,39 @@ const adminLinks = [
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if (!isAdminLoggedIn()) {
+        router.replace("/admin/login");
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [router]);
+
+  function logout() {
+    clearAdminLogin();
+    router.replace("/admin/login");
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-white">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center shadow-2xl shadow-black/30">
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-orange-400">
+            Admin
+          </p>
+          <p className="mt-2 text-xl font-black">Checking access...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
@@ -63,6 +98,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             >
               Back to Website
             </Link>
+            <button
+              type="button"
+              onClick={logout}
+              className="pressable rounded-2xl border border-red-400/30 px-4 py-3 text-left text-sm font-bold text-red-200 hover:bg-red-500/10"
+            >
+              Logout
+            </button>
           </nav>
         </aside>
 
