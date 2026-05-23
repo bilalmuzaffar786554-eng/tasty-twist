@@ -55,9 +55,9 @@ export function AdminLoginPage() {
             <Image
               src="/tasty-twist-logo.png.png"
               alt="Tasty Twist logo"
-              width={64}
-              height={64}
-              className="h-full w-full object-contain"
+              width={78}
+              height={78}
+              className="h-[115%] w-[115%] object-contain"
               priority
             />
           </span>

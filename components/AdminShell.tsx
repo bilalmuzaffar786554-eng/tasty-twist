@@ -58,9 +58,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <Image
                 src="/tasty-twist-logo.png.png"
                 alt="Tasty Twist logo"
-                width={48}
-                height={48}
-                className="h-full w-full object-contain"
+                width={62}
+                height={62}
+                className="h-[115%] w-[115%] object-contain"
                 priority
               />
             </span>
