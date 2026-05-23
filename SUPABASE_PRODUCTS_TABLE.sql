@@ -12,8 +12,16 @@ create table if not exists public.products (
   ingredients jsonb not null default '[]'::jsonb,
   badges jsonb not null default '[]'::jsonb,
   available boolean not null default true,
+  rating numeric(2, 1),
+  prep_time text,
+  calories integer,
   created_at timestamptz not null default now()
 );
+
+alter table public.products
+add column if not exists rating numeric(2, 1),
+add column if not exists prep_time text,
+add column if not exists calories integer;
 
 alter table public.products enable row level security;
 

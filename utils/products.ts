@@ -13,7 +13,10 @@ type ProductRow = {
   ingredients: string[] | string | null;
   badges: Badge[] | string | null;
   available: boolean | null;
+  calories?: number | null;
   created_at?: string;
+  prep_time?: string | null;
+  rating?: number | null;
 };
 
 export type ProductInput = Omit<FoodItem, "id"> & {
@@ -55,11 +58,11 @@ function rowToProduct(row: ProductRow): FoodItem {
     image: row.image || fallbackImage,
     ingredients: parseList<string>(row.ingredients),
     badges: parseList<Badge>(row.badges),
-    calories: 520,
+    calories: row.calories ?? 520,
     isAvailable: row.available ?? true,
     isFeatured: parseList<Badge>(row.badges).includes("Popular"),
-    prepTime: "10-15 min",
-    rating: 4.7,
+    prepTime: row.prep_time ?? "10-15 min",
+    rating: row.rating ?? 4.7,
   };
 }
 
@@ -74,6 +77,9 @@ function productToRow(product: ProductInput) {
     ingredients: product.ingredients,
     badges: product.badges,
     available: product.isAvailable ?? true,
+    calories: product.calories ?? null,
+    prep_time: product.prepTime ?? null,
+    rating: product.rating ?? null,
   };
 }
 
