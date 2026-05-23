@@ -10,7 +10,7 @@ import {
   getDeliveryFee,
   getDiscount,
   getOrderTotal,
-  saveOrderToHistory,
+  saveOrderToSupabase,
 } from "@/utils/order";
 
 export function CheckoutPage() {
@@ -59,7 +59,7 @@ export function CheckoutPage() {
     setIsCouponApplied(true);
   }
 
-  function placeOrder(event: FormEvent<HTMLFormElement>) {
+  async function placeOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError("");
 
@@ -90,7 +90,8 @@ export function CheckoutPage() {
 
     setIsPlacingOrder(true);
 
-    window.setTimeout(() => {
+    try {
+      await new Promise((resolve) => window.setTimeout(resolve, 650));
       const orderNumber = generateTemporaryOrderNumber();
       const placedOrder: SavedOrder = {
         orderNumber,
@@ -111,13 +112,21 @@ export function CheckoutPage() {
         paymentMethod: "Cash",
         status: "Preparing",
       };
+      const savedOrder = await saveOrderToSupabase(placedOrder);
 
-      saveOrderToHistory(placedOrder);
-      setReceipt(placedOrder);
+      setReceipt(savedOrder);
       clearCart();
-      setIsPlacingOrder(false);
       showToast(`Order ${orderNumber} placed successfully`);
-    }, 650);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to place order. Please try again.";
+
+      setFormError(`Supabase error: ${message}`);
+    } finally {
+      setIsPlacingOrder(false);
+    }
   }
 
   return (

@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { previousOrders } from "@/data/orders";
 import type { SavedOrder } from "@/types";
 import {
-  clearSavedOrders,
+  fetchOrdersFromSupabase,
   formatPrice,
   getCartItemCustomizationLines,
-  getSavedOrders,
   orderTimelineSteps,
 } from "@/utils/order";
 
@@ -36,19 +34,29 @@ function statusClasses(status: string) {
 export function OrdersPage() {
   const [savedOrders, setSavedOrders] = useState<SavedOrder[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<SavedOrder | null>(null);
+  const [ordersError, setOrdersError] = useState("");
+
+  function loadOrders() {
+    fetchOrdersFromSupabase()
+      .then((ordersFromSupabase) => {
+        setSavedOrders(ordersFromSupabase);
+        setOrdersError("");
+      })
+      .catch((error) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Unable to load Supabase orders.";
+
+        setOrdersError(message);
+      });
+  }
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setSavedOrders(getSavedOrders());
-    }, 0);
+    const timeoutId = window.setTimeout(loadOrders, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, []);
-
-  function clearOrderHistory() {
-    clearSavedOrders();
-    setSavedOrders([]);
-  }
 
   const hasSavedOrders = savedOrders.length > 0;
 
@@ -73,25 +81,31 @@ export function OrdersPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-neutral-400">
             {hasSavedOrders
-              ? "These orders were saved locally in this browser."
-              : "No saved orders yet, so sample frontend-only orders are shown."}
+              ? "These orders are loaded from Supabase."
+              : "No Supabase orders found yet. Place an order from checkout."}
           </p>
         </div>
 
-        {hasSavedOrders && (
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={clearOrderHistory}
-            className="pressable rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-neutral-300 hover:border-red-400 hover:bg-red-500/10 hover:text-red-300"
+            onClick={loadOrders}
+            className="pressable rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-neutral-300 hover:border-orange-400 hover:text-orange-300"
           >
-            Clear Order History
+            Refresh Orders
           </button>
-        )}
+        </div>
       </div>
 
+      {ordersError && (
+        <p className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-200">
+          Supabase error: {ordersError}
+        </p>
+      )}
+
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {hasSavedOrders
-          ? savedOrders.map((order) => (
+        {hasSavedOrders ? (
+          savedOrders.map((order) => (
               <article
                 key={order.orderNumber}
                 className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-orange-400/50 hover:bg-white/[0.06] sm:p-6"
@@ -185,56 +199,14 @@ export function OrdersPage() {
                 </div>
               </article>
             ))
-          : previousOrders.map((order) => (
-              <article
-                key={order.id}
-                className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-xl shadow-black/20 transition duration-300 hover:-translate-y-1 hover:border-orange-400/50 hover:bg-white/[0.06] sm:p-6"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-bold text-neutral-400">
-                      {order.date}
-                    </p>
-                    <h2 className="mt-2 text-xl font-black sm:text-2xl">
-                      {order.id}
-                    </h2>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-black capitalize ${statusClasses(
-                      order.status,
-                    )}`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
-
-                <div className="mt-5 space-y-2 text-sm">
-                  <p className="font-bold uppercase tracking-[0.18em] text-orange-300">
-                    {order.type}
-                  </p>
-                  <p className="text-neutral-300">
-                    Customer:{" "}
-                    <span className="font-bold text-white">
-                      Sample Customer
-                    </span>
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-2 text-sm text-neutral-300">
-                  {order.items.map((item) => (
-                    <p key={item}>{item}</p>
-                  ))}
-                </div>
-                <div className="mt-6 border-t border-white/10 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-400">Total</span>
-                    <span className="text-xl font-black">
-                      {formatPrice(order.total)}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
+        ) : (
+          <div className="col-span-full rounded-3xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
+            <p className="text-xl font-black">No orders yet.</p>
+            <p className="mt-2 text-sm leading-6 text-neutral-400">
+              New orders will appear here after checkout saves them to Supabase.
+            </p>
+          </div>
+        )}
       </div>
     </section>
 

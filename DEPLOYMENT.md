@@ -1,6 +1,6 @@
 # Tasty Twist Vercel Deployment Guide
 
-This project is a frontend-only Next.js app. It uses localStorage for cart, orders, and admin menu data.
+This project is a Next.js app with a Supabase-powered order system. It still uses localStorage for cart and admin menu draft data.
 
 ## 1. Check The Project Locally
 
@@ -54,7 +54,24 @@ Vercel works best when your project is on GitHub.
    - Install Command: `npm install`
 7. Click `Deploy`.
 
-## 4. After Deployment
+## 4. Add Environment Variables On Vercel
+
+Before the production site can read and create orders, add these Vercel environment variables:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+In Vercel:
+
+1. Open your project.
+2. Go to `Settings`.
+3. Go to `Environment Variables`.
+4. Add both variables.
+5. Redeploy the project.
+
+## 5. After Deployment
 
 Open your Vercel website URL and test:
 
@@ -68,12 +85,12 @@ Open your Vercel website URL and test:
 
 ## Important Note About Data
 
-This app does not use a real database yet.
+Orders are saved in the existing Supabase `public.orders` table.
 
-Cart items, orders, and admin menu changes are saved in the browser localStorage. That means:
+Cart items and admin menu changes are still saved in browser localStorage. That means:
 
-- Data stays in the same browser.
-- Data does not sync between different users or devices.
-- Data can disappear if browser storage is cleared.
+- Cart/admin menu draft data stays in the same browser.
+- Cart/admin menu draft data does not sync between different users or devices.
+- Cart/admin menu draft data can disappear if browser storage is cleared.
 
-That is expected for this frontend-only version.
+That is expected for this current version.

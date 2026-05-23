@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import type { SavedOrder } from "@/types";
-import { formatPrice, getSavedOrders } from "@/utils/order";
+import { fetchOrdersFromSupabase, formatPrice } from "@/utils/order";
 
 function isToday(dateText: string) {
   const orderDate = new Date(dateText);
@@ -17,10 +17,23 @@ function isToday(dateText: string) {
 
 export function AdminDashboardPage() {
   const [orders, setOrders] = useState<SavedOrder[]>([]);
+  const [ordersError, setOrdersError] = useState("");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setOrders(getSavedOrders());
+      fetchOrdersFromSupabase()
+        .then((ordersFromSupabase) => {
+          setOrders(ordersFromSupabase);
+          setOrdersError("");
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Unable to load Supabase orders.";
+
+          setOrdersError(message);
+        });
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
@@ -75,9 +88,15 @@ export function AdminDashboardPage() {
             Restaurant overview
           </h1>
           <p className="mt-4 max-w-2xl text-neutral-400">
-            Frontend-only admin metrics based on orders saved in this browser.
+            Admin metrics based on live Supabase orders.
           </p>
         </div>
+
+        {ordersError && (
+          <p className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-200">
+            Supabase error: {ordersError}
+          </p>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {stats.map((stat) => (

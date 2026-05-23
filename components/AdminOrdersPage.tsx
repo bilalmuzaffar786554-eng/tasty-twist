@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import type { OrderStatus, SavedOrder } from "@/types";
 import {
+  fetchOrdersFromSupabase,
   formatPrice,
   getCartItemCustomizationLines,
-  getSavedOrders,
-  updateSavedOrderStatus,
+  updateOrderStatusInSupabase,
 } from "@/utils/order";
 
 const orderStatuses: OrderStatus[] = [
@@ -45,17 +45,51 @@ function statusClasses(status: OrderStatus) {
 
 export function AdminOrdersPage() {
   const [orders, setOrders] = useState<SavedOrder[]>([]);
+  const [ordersError, setOrdersError] = useState("");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setOrders(getSavedOrders());
+      fetchOrdersFromSupabase()
+        .then((ordersFromSupabase) => {
+          setOrders(ordersFromSupabase);
+          setOrdersError("");
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Unable to load Supabase orders.";
+
+          setOrdersError(message);
+        });
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, []);
 
-  function changeStatus(orderNumber: string, status: OrderStatus) {
-    setOrders(updateSavedOrderStatus(orderNumber, status));
+  async function changeStatus(orderNumber: string, status: OrderStatus) {
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.orderNumber === orderNumber ? { ...order, status } : order,
+      ),
+    );
+
+    try {
+      await updateOrderStatusInSupabase(orderNumber, status);
+      setOrdersError("");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to update Supabase order status.";
+
+      setOrdersError(message);
+      try {
+        setOrders(await fetchOrdersFromSupabase());
+      } catch {
+        setOrders((currentOrders) => currentOrders);
+      }
+    }
   }
 
   return (
@@ -69,13 +103,19 @@ export function AdminOrdersPage() {
             Manage orders
           </h1>
           <p className="mt-4 max-w-2xl text-neutral-400">
-            Update frontend-only order statuses saved in browser localStorage.
+            Update live order statuses from Supabase.
           </p>
         </div>
 
+        {ordersError && (
+          <p className="mb-5 rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-200">
+            Supabase error: {ordersError}
+          </p>
+        )}
+
         {orders.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
-            <p className="text-xl font-black">No saved orders yet.</p>
+            <p className="text-xl font-black">No Supabase orders yet.</p>
             <p className="mt-2 text-sm leading-6 text-neutral-400">
               Place an order from the website checkout, then return here.
             </p>
