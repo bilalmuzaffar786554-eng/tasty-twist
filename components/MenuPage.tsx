@@ -4,22 +4,30 @@ import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductModal } from "@/components/ProductModal";
 import { useCart } from "@/components/CartProvider";
-import { categories, menuItems } from "@/data/products";
+import { categories } from "@/data/products";
 import type { Category, FoodItem } from "@/types";
+import { getMenuProducts } from "@/utils/products";
 
 export function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<FoodItem | null>(null);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [products, setProducts] = useState<FoodItem[]>([]);
   const { addToCart } = useCart();
-  const visibleCategories = categories.filter(
-    (category): category is Exclude<Category, "All"> => category !== "All",
+  const visibleCategories = useMemo(
+    () =>
+      categories.filter(
+        (category): category is Exclude<Category, "All"> => category !== "All",
+      ),
+    [],
   );
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setIsLoadingProducts(false);
+      getMenuProducts()
+        .then(setProducts)
+        .finally(() => setIsLoadingProducts(false));
     }, 700);
 
     return () => window.clearTimeout(timeoutId);
@@ -58,7 +66,7 @@ export function MenuPage() {
   const filteredItems = useMemo(() => {
     const cleanSearch = searchQuery.trim().toLowerCase();
 
-    return menuItems.filter((item) => {
+    return products.filter((item) => {
       const matchesCategory =
         selectedCategory === "All" || item.category === selectedCategory;
       const searchableText = [
@@ -74,14 +82,14 @@ export function MenuPage() {
 
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [products, selectedCategory, searchQuery]);
 
   const groupedItems = useMemo(() => {
     return visibleCategories.map((category) => ({
       category,
-      items: menuItems.filter((item) => item.category === category),
+      items: products.filter((item) => item.category === category),
     }));
-  }, [visibleCategories]);
+  }, [products, visibleCategories]);
 
   const isSearching = searchQuery.trim().length > 0;
 

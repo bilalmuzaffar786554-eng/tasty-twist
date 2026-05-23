@@ -56,7 +56,7 @@ Vercel works best when your project is on GitHub.
 
 ## 4. Add Environment Variables On Vercel
 
-Before the production site can read and create orders, add these Vercel environment variables:
+Before the production site can read and create orders/products, add these Vercel environment variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
@@ -71,7 +71,22 @@ In Vercel:
 4. Add both variables.
 5. Redeploy the project.
 
-## 5. After Deployment
+## 5. Create The Products Table
+
+The admin menu and public menu share the Supabase `public.products` table.
+
+In Supabase:
+
+1. Open your Supabase project.
+2. Go to `SQL Editor`.
+3. Open this project file:
+   - `SUPABASE_PRODUCTS_TABLE.sql`
+4. Copy the SQL into Supabase.
+5. Click `Run`.
+
+After this, products added from `/admin/menu` will also appear on `/menu`.
+
+## 6. After Deployment
 
 Open your Vercel website URL and test:
 
@@ -86,11 +101,12 @@ Open your Vercel website URL and test:
 ## Important Note About Data
 
 Orders are saved in the existing Supabase `public.orders` table.
+Products are saved in the Supabase `public.products` table.
 
-Cart items and admin menu changes are still saved in browser localStorage. That means:
+Cart items are still saved in browser localStorage. That means:
 
-- Cart/admin menu draft data stays in the same browser.
-- Cart/admin menu draft data does not sync between different users or devices.
-- Cart/admin menu draft data can disappear if browser storage is cleared.
+- Cart data stays in the same browser.
+- Cart data does not sync between different users or devices.
+- Cart data can disappear if browser storage is cleared.
 
 That is expected for this current version.

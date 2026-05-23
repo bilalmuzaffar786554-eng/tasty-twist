@@ -6,8 +6,14 @@ import { AdminShell } from "@/components/AdminShell";
 import { categories, menuItems } from "@/data/products";
 import type { Badge, Category, FoodItem } from "@/types";
 import { formatPrice } from "@/utils/order";
+import {
+  createProductInSupabase,
+  deleteProductFromSupabase,
+  fetchProductsFromSupabase,
+  updateProductAvailabilityInSupabase,
+  updateProductInSupabase,
+} from "@/utils/products";
 
-const adminMenuStorageKey = "tasty-twist-admin-menu";
 const badgeOptions: Badge[] = ["Popular", "Spicy", "New", "Best Seller"];
 const productCategories = categories.filter(
   (category): category is Exclude<Category, "All"> => category !== "All",
@@ -51,50 +57,23 @@ function productToForm(product: FoodItem): ProductFormState {
   };
 }
 
-function loadAdminMenuItems() {
-  if (typeof window === "undefined") {
-    return menuItems;
-  }
-
-  const savedItems = window.localStorage.getItem(adminMenuStorageKey);
-
-  if (!savedItems) {
-    return menuItems;
-  }
-
-  try {
-    return JSON.parse(savedItems) as FoodItem[];
-  } catch {
-    window.localStorage.removeItem(adminMenuStorageKey);
-    return menuItems;
-  }
-}
-
-function saveAdminMenuItems(items: FoodItem[]) {
-  window.localStorage.setItem(adminMenuStorageKey, JSON.stringify(items));
-}
-
 export function AdminMenuPage() {
   const [products, setProducts] = useState<FoodItem[]>(menuItems);
   const [form, setForm] = useState<ProductFormState>(emptyForm);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | string | null>(null);
   const [message, setMessage] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category>("All");
   const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
-      setProducts(loadAdminMenuItems());
+      loadProducts();
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, []);
 
   const formTitle = editingId ? "Edit product" : "Add product";
-
-  const nextProductId = useMemo(() => {
-    return Math.max(...products.map((product) => product.id), 0) + 1;
-  }, [products]);
 
   const visibleProducts = useMemo(() => {
     const filteredProducts = products.filter(
@@ -114,9 +93,30 @@ export function AdminMenuPage() {
         return first.name.localeCompare(second.name);
       }
 
-      return second.id - first.id;
+      return String(second.id).localeCompare(String(first.id));
     });
   }, [categoryFilter, products, sortBy]);
+
+  async function loadProducts() {
+    try {
+      const supabaseProducts = await fetchProductsFromSupabase({
+        includeUnavailable: true,
+      });
+
+      setProducts(supabaseProducts);
+      setMessage(
+        supabaseProducts.length > 0
+          ? ""
+          : "No Supabase products found yet. Add your first product here.",
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unable to load products.";
+
+      setProducts(menuItems);
+      setMessage(`Supabase products error: ${errorMessage}`);
+    }
+  }
 
   function updateForm(field: keyof ProductFormState, value: string) {
     setForm((currentForm) => ({ ...currentForm, [field]: value }));
@@ -138,7 +138,7 @@ export function AdminMenuPage() {
     setMessage("");
   }
 
-  function submitProduct(event: FormEvent<HTMLFormElement>) {
+  async function submitProduct(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const price = Number(form.price);
@@ -149,7 +149,7 @@ export function AdminMenuPage() {
     }
 
     const product: FoodItem = {
-      id: editingId ?? nextProductId,
+      id: editingId ?? "",
       name: form.name.trim(),
       category: form.category,
       description: form.description.trim(),
@@ -170,15 +170,27 @@ export function AdminMenuPage() {
       rating: 4.7,
     };
 
-    const updatedProducts = editingId
-      ? products.map((item) => (item.id === editingId ? product : item))
-      : [product, ...products];
+    try {
+      const savedProduct = editingId
+        ? await updateProductInSupabase(editingId, product)
+        : await createProductInSupabase(product);
 
-    setProducts(updatedProducts);
-    saveAdminMenuItems(updatedProducts);
-    setForm(emptyForm);
-    setEditingId(null);
-    setMessage(editingId ? "Product updated." : "Product added.");
+      setProducts((currentProducts) =>
+        editingId
+          ? currentProducts.map((item) =>
+              item.id === editingId ? savedProduct : item,
+            )
+          : [savedProduct, ...currentProducts],
+      );
+      setForm(emptyForm);
+      setEditingId(null);
+      setMessage(editingId ? "Product updated in Supabase." : "Product added to Supabase.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unable to save product.";
+
+      setMessage(`Supabase products error: ${errorMessage}`);
+    }
   }
 
   function editProduct(product: FoodItem) {
@@ -187,31 +199,53 @@ export function AdminMenuPage() {
     setMessage("");
   }
 
-  function deleteProduct(productId: number) {
-    const updatedProducts = products.filter((product) => product.id !== productId);
+  async function deleteProduct(productId: number | string) {
+    try {
+      await deleteProductFromSupabase(productId);
+      setProducts((currentProducts) =>
+        currentProducts.filter((product) => product.id !== productId),
+      );
+      setMessage("Product deleted from Supabase.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unable to delete product.";
 
-    setProducts(updatedProducts);
-    saveAdminMenuItems(updatedProducts);
-    setMessage("Product deleted.");
+      setMessage(`Supabase products error: ${errorMessage}`);
+    }
   }
 
-  function toggleAvailability(productId: number) {
-    const updatedProducts = products.map((product) =>
-      product.id === productId
-        ? { ...product, isAvailable: !(product.isAvailable ?? true) }
-        : product,
-    );
+  async function toggleAvailability(productId: number | string) {
+    const product = products.find((item) => item.id === productId);
 
-    setProducts(updatedProducts);
-    saveAdminMenuItems(updatedProducts);
-    setMessage("Availability updated.");
+    if (!product) {
+      return;
+    }
+
+    try {
+      const updatedProduct = await updateProductAvailabilityInSupabase(
+        productId,
+        !(product.isAvailable ?? true),
+      );
+
+      setProducts((currentProducts) =>
+        currentProducts.map((item) =>
+          item.id === productId ? updatedProduct : item,
+        ),
+      );
+      setMessage("Availability updated in Supabase.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unable to update availability.";
+
+      setMessage(`Supabase products error: ${errorMessage}`);
+    }
   }
 
   function resetToDefaultMenu() {
-    setProducts(menuItems);
-    saveAdminMenuItems(menuItems);
+    loadProducts();
     resetForm();
-    setMessage("Menu reset to default products.");
   }
 
   return (
@@ -235,7 +269,7 @@ export function AdminMenuPage() {
             onClick={resetToDefaultMenu}
             className="pressable rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-neutral-300 hover:border-orange-400 hover:text-orange-300"
           >
-            Reset Default Menu
+            Reload Products
           </button>
         </div>
 

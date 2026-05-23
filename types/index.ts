@@ -36,7 +36,7 @@ export type ProductCustomization = {
 };
 
 export type FoodItem = {
-  id: number;
+  id: number | string;
   name: string;
   category: Exclude<Category, "All">;
   description: string;

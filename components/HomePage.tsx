@@ -1,20 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductModal } from "@/components/ProductModal";
 import { useCart } from "@/components/CartProvider";
 import { menuItems } from "@/data/products";
 import type { FoodItem } from "@/types";
+import { getMenuProducts } from "@/utils/products";
 
 export function HomePage() {
   const { addToCart, openCart } = useCart();
   const [selectedProduct, setSelectedProduct] = useState<FoodItem | null>(null);
-  const featuredItems = menuItems
-    .filter((item) => item.badges.length > 0)
-    .slice(0, 4);
+  const [products, setProducts] = useState<FoodItem[]>(menuItems);
+  const featuredItems = useMemo(
+    () => products.filter((item) => item.badges.length > 0).slice(0, 4),
+    [products],
+  );
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      getMenuProducts().then(setProducts);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   return (
     <>
